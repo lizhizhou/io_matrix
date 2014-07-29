@@ -9,57 +9,31 @@
 #include <list>
 using namespace std;
 
-class direction {
-private:
-	static const int INPUT  = 1;
-	static const int OUTPUT = 2;
-	static const int INOUT  = 3;
-	int direction;
-public:
-	string to_string();
-	void input();
-	void output();
-	void inout();
+enum direction {
+	INPUT  = 1,
+	OUTPUT = 2,
+	INOUT  = 3
 };
-
-string direction::to_string()
-{
-	switch(direction) {
-	case 1:
-		return "input";
-	case 2:
-		return "ouput";
-	case 3:
-		return "inout";
-	default:
-		return "undefine";
-	}
-}
-void direction::input()
-{
-	direction = INPUT;
-}
-void direction::output()
-{
-	direction = OUTPUT;
-}
-void direction::inout()
-{
-	direction = INOUT;
-}
 
 class io
 {
 private:
 	string name;
-	direction directory;
+	direction d;
 	int width;
 	class io* connector;
 public:
 	string to_verilog_name();
 	string to_c_name();
 	int hash();
+	io(string io_name, direction dir);
 };
+
+io::io(string io_name, direction dir)
+{
+	name = io_name;
+    d = dir;
+}
 
 string io::to_verilog_name()
 {
@@ -79,8 +53,20 @@ private:
 public:
 	string to_verilog_name();
 	string to_c_name();
+	interface(string interface_name);
+	void add_io_pin(io pin);
 	int hash();
 };
+
+interface::interface(string interface_name)
+{
+	name = interface_name;
+}
+
+void interface::add_io_pin(io pin)
+{
+	io_pin_list.push_front(pin);
+}
 
 string interface::to_verilog_name()
 {
@@ -94,7 +80,17 @@ string interface::to_c_name()
 
 int main()
 {
-	cout << "lizhizhou";
+	interface pio26a =  interface("PIO26A");
+	pio26a.add_io_pin(io("PIN_1", INOUT));
+	pio26a.add_io_pin(io("PIN_2", INOUT));
+	pio26a.add_io_pin(io("PIN_3", INOUT));
+	pio26a.add_io_pin(io("PIN_4", INOUT));
+	pio26a.add_io_pin(io("PIN_5", INOUT));
+	pio26a.add_io_pin(io("PIN_6", INOUT));
+	interface pio26b =  interface("PIO26B");
+	list<interface> left_side, right_side;
+	right_side.push_front(pio26a);
+	right_side.push_front(pio26b);
 	return 0;
 }
 
