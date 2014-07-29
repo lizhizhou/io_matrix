@@ -24,6 +24,7 @@ private:
 public:
 	string to_verilog_name();
 	string to_c_name();
+	int hash();
 };
 
 string io::to_verilog_name()
@@ -44,6 +45,7 @@ private:
 public:
 	string to_verilog_name();
 	string to_c_name();
+	int hash();
 };
 
 string interface::to_verilog_name()
