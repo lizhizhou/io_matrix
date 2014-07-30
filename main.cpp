@@ -19,20 +19,21 @@ class io
 {
 private:
 	string name;
-	direction d;
+	direction dir;
 	int width;
 	class io* connector;
 public:
 	string to_verilog_name();
 	string to_c_name();
 	int hash();
-	io(string io_name, direction dir);
+	io(string io_name, direction d, int w);
 };
 
-io::io(string io_name, direction dir)
+io::io(string io_name, direction d, int w)
 {
 	name = io_name;
-    d = dir;
+    dir = d;
+    width = w;
 }
 
 string io::to_verilog_name()
@@ -81,12 +82,12 @@ string interface::to_c_name()
 int main()
 {
 	interface pio26a =  interface("PIO26A");
-	pio26a.add_io_pin(io("PIN_1", INOUT));
-	pio26a.add_io_pin(io("PIN_2", INOUT));
-	pio26a.add_io_pin(io("PIN_3", INOUT));
-	pio26a.add_io_pin(io("PIN_4", INOUT));
-	pio26a.add_io_pin(io("PIN_5", INOUT));
-	pio26a.add_io_pin(io("PIN_6", INOUT));
+	pio26a.add_io_pin(io("PIN_1", INOUT, 1));
+	pio26a.add_io_pin(io("PIN_2", INOUT, 1));
+	pio26a.add_io_pin(io("PIN_3", INOUT, 1));
+	pio26a.add_io_pin(io("PIN_4", INOUT, 1));
+	pio26a.add_io_pin(io("PIN_5", INOUT, 1));
+	pio26a.add_io_pin(io("PIN_6", INOUT, 1));
 	interface pio26b =  interface("PIO26B");
 	list<interface> left_side, right_side;
 	right_side.push_front(pio26a);
