@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <stdlib.h>
 using namespace std;
 
 enum direction {
@@ -38,7 +39,25 @@ io::io(string io_name, direction d, int w)
 
 string io::to_verilog_name()
 {
-	return name;
+	string buffer = "";
+	switch (dir)
+	{
+		case INPUT:
+		buffer += "input";
+		break;
+		case OUTPUT:
+		buffer += "output";
+		break;
+		case INOUT:
+		buffer += "inout";
+		break;
+		default:
+		break;
+	}
+	if (width > 1)
+		buffer = buffer + "[0:"+  + "]";
+	buffer += name;
+	return buffer;
 }
 
 string io::to_c_name()
@@ -66,7 +85,7 @@ interface::interface(string interface_name)
 
 void interface::add_io_pin(io pin)
 {
-	io_pin_list.push_front(pin);
+	io_pin_list.push_back(pin);
 }
 
 string interface::to_verilog_name()
@@ -94,11 +113,12 @@ int main()
 	pio26a.add_io_pin(io("PIN_5", INOUT, 1));
 	pio26a.add_io_pin(io("PIN_6", INOUT, 1));
 	interface pio26b =  interface("PIO26B");
-	pio26a.add_io_pin(io("PIN", INOUT, 26));
+	pio26b.add_io_pin(io("PIN", INOUT, 26));
 	list<interface> left_side, right_side;
-	right_side.push_front(pio26a);
-	right_side.push_front(pio26b);
-	cout << pio26a.to_verilog_name();
+	right_side.push_back(pio26a);
+	right_side.push_back(pio26b);
+	cout << pio26a.to_verilog_name() << endl;
+	cout << pio26b.to_verilog_name() << endl;
 	return 0;
 }
 
