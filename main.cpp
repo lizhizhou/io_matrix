@@ -71,7 +71,12 @@ void interface::add_io_pin(io pin)
 
 string interface::to_verilog_name()
 {
-	return name;
+	list<io>::iterator iterator;
+	string buffer = "";
+	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
+		buffer += (*iterator).to_verilog_name() + "_" +name + "\n";
+	}
+	return buffer;
 }
 
 string interface::to_c_name()
@@ -89,9 +94,11 @@ int main()
 	pio26a.add_io_pin(io("PIN_5", INOUT, 1));
 	pio26a.add_io_pin(io("PIN_6", INOUT, 1));
 	interface pio26b =  interface("PIO26B");
+	pio26a.add_io_pin(io("PIN", INOUT, 26));
 	list<interface> left_side, right_side;
 	right_side.push_front(pio26a);
 	right_side.push_front(pio26b);
+	cout << pio26a.to_verilog_name();
 	return 0;
 }
 
