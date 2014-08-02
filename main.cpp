@@ -10,6 +10,7 @@
 #include <string>
 #include <list>
 #include <stdlib.h>
+
 using namespace std;
 
 enum direction {
@@ -27,7 +28,7 @@ private:
 	class io* connector;
 public:
 	string to_verilog_name();
-	string to_c_name();
+	string get_name();
 	int hash();
 	io(string io_name, direction d, int w = 1);
 };
@@ -65,7 +66,7 @@ string io::to_verilog_name()
 	return buffer;
 }
 
-string io::to_c_name()
+string io::get_name()
 {
 	return name;
 }
@@ -81,6 +82,7 @@ public:
 	interface(string interface_name);
 	interface(interface template_interface, string interface_name);
 	void add_io_pin(io pin);
+	io* operator()(string io_name);
 	int hash();
 };
 
@@ -103,12 +105,22 @@ void interface::add_io_pin(io pin)
 	io_pin_list.push_back(pin);
 }
 
+io* interface::operator()(string io_name)
+{
+	list<io>::iterator i;
+	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
+		if ((*i).get_name() == io_name)
+			return &(*i);
+	}
+	return NULL;
+}
+
 string interface::to_verilog_name()
 {
-	list<io>::iterator iterator;
+	list<io>::iterator i;
 	string buffer = "";
-	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
-		buffer += (*iterator).to_verilog_name() + "_" + name + ",\n";
+	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
+		buffer += (*i).to_verilog_name() + "_" + name + ",\n";
 	}
 	return buffer;
 }
@@ -118,23 +130,37 @@ string interface::to_c_name()
 	list<io>::iterator iterator;
 	string buffer = "";
 	string pin_name;
-	buffer = buffer + "int" + " enable_" + name + "\n";
+	buffer = buffer + "int" + " enable_" + name + "(void)\n";
 	buffer = buffer + "{\n";
 	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
-		pin_name = (*iterator).to_c_name() + "_" + name;
+		pin_name = (*iterator).get_name() + "_" + name;
 		buffer = buffer + "if ("+ pin_name +" == 0) {\n" + pin_name + " = 1;\n" + "} else {\n" + "return 0;\n"+"}\n";
 	}
 	buffer = buffer + "return 1;\n" + "}\n";
-	buffer = buffer + "int" + " disable_" + name + "\n";
+	buffer = buffer + "int" + " disable_" + name + "(void)\n";
 	buffer = buffer + "{\n";
 	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
-		pin_name = (*iterator).to_c_name() + "_" + name;
+		pin_name = (*iterator).get_name() + "_" + name;
 		buffer = buffer + "if ("+ pin_name +" == 1) {\n" + pin_name + " = 0;\n" + "} else {\n" + "return 0;\n"+"}\n";
 	}
 	buffer = buffer + "return 1;\n" + "}\n";
 	return buffer;
 }
 
+
+list<bool> add_one_bitmap(list<bool> bitmap, bool value, size_t i, size_t n)
+{
+	//bitmap
+	//add_one_bitmap()
+}
+
+
+list< list<bool> > generate_all_the_possible_combination_bitmap(size_t n)
+{
+	list<bool> bitmap;
+	list< list<bool> > bitmap_list;
+
+}
 int main()
 {
 	interface pio26a =  interface("PIO26_A");
@@ -167,6 +193,11 @@ int main()
 	left_side.push_back(step_motor_1);
 	left_side.push_back(brush_motor_0);
 
+	for (iterator = left_side.begin(); iterator != left_side.end(); ++iterator) {
+
+
+	}
+
 	stringstream s;
 	int hash = 100;
 	s << hash;
@@ -180,10 +211,11 @@ int main()
 	for (iterator = right_side.begin(); iterator != right_side.end(); ++iterator) {
 		verilog_file << (*iterator).to_verilog_name() << endl;
 	}
-
+	verilog_file << "input clock";
 	verilog_file << ");" << endl;
-
 	verilog_file << "endmodule" << endl;
+
+
 
 	filename = "grid.h";
 	ofstream h_file (filename.c_str());
