@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <list>
+#include <vector>
 #include <stdlib.h>
 
 using namespace std;
@@ -161,20 +162,20 @@ string interface::to_c_name()
 	return buffer;
 }
 
-//todo: change to array
 class combination_bitmap
 {
 private:
-	list<bool> bitmap;
-	list< list<bool> > bitmap_list;
-	void add_one_bitmap(list< list<bool> >* bitmap_list, list<bool>* bitmap, size_t i, size_t n);
+	vector<bool> bitmap;
+	vector< vector<bool> > bitmap_list;
+	void add_one_bitmap(vector< vector<bool> >* bitmap_list, vector<bool>* bitmap, size_t i, size_t n);
 public:
 	combination_bitmap(size_t n);
-	list< list<bool> > get_bitmap_list();
+	vector< vector<bool> > get_bitmap_list();
+	vector<bool> operator[](int i);
 	double to_value();
 };
 
-void combination_bitmap::add_one_bitmap(list< list<bool> >* bitmap_list, list<bool>* bitmap, size_t i, size_t n)
+void combination_bitmap::add_one_bitmap(vector< vector<bool> >* bitmap_list, vector<bool>* bitmap, size_t i, size_t n)
 {
 	if(i == n) {
 		bitmap_list->push_back(*bitmap);
@@ -194,9 +195,14 @@ combination_bitmap::combination_bitmap(size_t n)
 	add_one_bitmap(&bitmap_list, &bitmap, 1, n);
 }
 
-list< list<bool> > combination_bitmap::get_bitmap_list()
+vector< vector<bool> > combination_bitmap::get_bitmap_list()
 {
 	return bitmap_list;
+}
+
+vector<bool> combination_bitmap::operator[](int i)
+{
+	return bitmap_list[i];
 }
 
 int main()
@@ -208,6 +214,10 @@ int main()
 	pio26a.add_io_pin(io("PIN_4", INOUT));
 	pio26a.add_io_pin(io("PIN_5", INOUT));
 	pio26a.add_io_pin(io("PIN_6", INOUT));
+	pio26a.add_io_pin(io("PIN_7", INOUT));
+	pio26a.add_io_pin(io("PIN_8", INOUT));
+	pio26a.add_io_pin(io("PIN_9", INOUT));
+	pio26a.add_io_pin(io("PIN_10", INOUT));
 
 	interface pio26b =  interface("PIO26_B");
 	pio26b.add_io_pin(io("PIN", INOUT, 26));
@@ -221,6 +231,9 @@ int main()
 	step_motor_0.add_io_pin(io("BE", OUTPUT));
 	interface step_motor_1 =  interface(step_motor_0, "step_motor_1");
 	interface brush_motor_0 =  interface("brush_motor_0");
+	brush_motor_0.add_io_pin(io("HX", OUTPUT));
+	brush_motor_0.add_io_pin(io("HY", OUTPUT));
+	interface brush_motor_1 =  interface(brush_motor_0, "brush_motor_1");
 
 	list<interface>::iterator iterator;
 	list<interface> left_side, right_side;
@@ -230,17 +243,19 @@ int main()
 	left_side.push_back(step_motor_0);
 	left_side.push_back(step_motor_1);
 	left_side.push_back(brush_motor_0);
+	left_side.push_back(brush_motor_1);
 
-	list< list<bool> > bitmap_list = combination_bitmap(6).get_bitmap_list();
-	for (list< list<bool> >::iterator j = bitmap_list.begin(); j != bitmap_list.end(); j++)
+	vector< vector<bool> > bitmap_list = combination_bitmap(10).get_bitmap_list();
+	for (vector< vector<bool> >::iterator j = bitmap_list.begin(); j != bitmap_list.end(); j++)
 	{
-		list<bool> bitmap = *j;
-		for (list<bool>::iterator i = bitmap.begin(); i != bitmap.end(); i++)
+		vector<bool> bitmap = *j;
+		for (vector<bool>::iterator i = bitmap.begin(); i != bitmap.end(); i++)
 		{
 			cout << (int)(*i);
 		}
 		cout << endl;
 	}
+	cout << bitmap_list[1][2] << endl;
 
 	stringstream s;
 	int hash = 100;
@@ -275,7 +290,6 @@ int main()
 
 	cout << step_motor_0("AX")->get_name();
 	cout << step_motor_0[0]->get_name();
-
 
 	return 0;
 }
