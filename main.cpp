@@ -83,6 +83,7 @@ public:
 	interface(interface template_interface, string interface_name);
 	void add_io_pin(io pin);
 	io* operator()(string io_name);
+	io* operator[](int index);
 	int hash();
 };
 
@@ -110,6 +111,19 @@ io* interface::operator()(string io_name)
 	list<io>::iterator i;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		if ((*i).get_name() == io_name)
+			return &(*i);
+	}
+	return NULL;
+}
+
+io* interface::operator[](int index)
+{
+	list<io>::iterator i;
+	int j = 0;
+	if (index > (int)io_pin_list.size())
+		return NULL;
+	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i, ++j) {
+		if (j == index)
 			return &(*i);
 	}
 	return NULL;
@@ -147,20 +161,44 @@ string interface::to_c_name()
 	return buffer;
 }
 
-
-list<bool> add_one_bitmap(list<bool> bitmap, bool value, size_t i, size_t n)
+//todo: change to array
+class combination_bitmap
 {
-	//bitmap
-	//add_one_bitmap()
-}
-
-
-list< list<bool> > generate_all_the_possible_combination_bitmap(size_t n)
-{
+private:
 	list<bool> bitmap;
 	list< list<bool> > bitmap_list;
+	void add_one_bitmap(list< list<bool> >* bitmap_list, list<bool>* bitmap, size_t i, size_t n);
+public:
+	combination_bitmap(size_t n);
+	list< list<bool> > get_bitmap_list();
+	double to_value();
+};
 
+void combination_bitmap::add_one_bitmap(list< list<bool> >* bitmap_list, list<bool>* bitmap, size_t i, size_t n)
+{
+	if(i == n) {
+		bitmap_list->push_back(*bitmap);
+		return;
+	}
+	i++;
+	bitmap->push_back(true);
+	add_one_bitmap(bitmap_list, bitmap, i, n);
+	bitmap->pop_back();
+	bitmap->push_back(false);
+	add_one_bitmap(bitmap_list, bitmap, i, n);
+	bitmap->pop_back();
 }
+
+combination_bitmap::combination_bitmap(size_t n)
+{
+	add_one_bitmap(&bitmap_list, &bitmap, 1, n);
+}
+
+list< list<bool> > combination_bitmap::get_bitmap_list()
+{
+	return bitmap_list;
+}
+
 int main()
 {
 	interface pio26a =  interface("PIO26_A");
@@ -193,9 +231,15 @@ int main()
 	left_side.push_back(step_motor_1);
 	left_side.push_back(brush_motor_0);
 
-	for (iterator = left_side.begin(); iterator != left_side.end(); ++iterator) {
-
-
+	list< list<bool> > bitmap_list = combination_bitmap(6).get_bitmap_list();
+	for (list< list<bool> >::iterator j = bitmap_list.begin(); j != bitmap_list.end(); j++)
+	{
+		list<bool> bitmap = *j;
+		for (list<bool>::iterator i = bitmap.begin(); i != bitmap.end(); i++)
+		{
+			cout << (int)(*i);
+		}
+		cout << endl;
 	}
 
 	stringstream s;
@@ -215,8 +259,6 @@ int main()
 	verilog_file << ");" << endl;
 	verilog_file << "endmodule" << endl;
 
-
-
 	filename = "grid.h";
 	ofstream h_file (filename.c_str());
 
@@ -230,6 +272,10 @@ int main()
 	for (iterator = right_side.begin(); iterator != right_side.end(); ++iterator) {
 		c_file << (*iterator).to_c_name() << endl;
 	}
+
+	cout << step_motor_0("AX")->get_name();
+	cout << step_motor_0[0]->get_name();
+
 
 	return 0;
 }
