@@ -32,6 +32,9 @@ public:
 	string get_name();
 	int hash();
 	io(string io_name, direction d, int w = 1);
+
+	friend void connect(class io* left, class io* right);
+	io* operator=(class io* c);
 };
 
 io::io(string io_name, direction d, int w)
@@ -70,6 +73,19 @@ string io::to_verilog_name()
 string io::get_name()
 {
 	return name;
+}
+
+void connect(class io* left, class io* right)
+{
+	left->connector = right;
+	right->connector = left;
+}
+
+io* io::operator=(class io* c)
+{
+	this->connector = c;
+	c->connector = this;
+	return this;
 }
 
 class interface
@@ -290,6 +306,9 @@ int main()
 
 	cout << step_motor_0("AX")->get_name();
 	cout << step_motor_0[0]->get_name();
+
+	step_motor_0("AX")->operator =(pio26a("PIN_1"));
+	//step_motor_0("AX") = pio26a("PIN_1"); //compile error
 
 	return 0;
 }
