@@ -34,7 +34,7 @@ public:
 	io(string io_name, direction d, int w = 1);
 
 	friend void connect(class io* left, class io* right);
-	io* operator=(class io* c);
+	io& operator=(class io& c);
 };
 
 io::io(string io_name, direction d, int w)
@@ -81,11 +81,11 @@ void connect(class io* left, class io* right)
 	right->connector = left;
 }
 
-io* io::operator=(class io* c)
+io& io::operator=(class io& c)
 {
-	this->connector = c;
-	c->connector = this;
-	return this;
+	//this->connector = c;
+	//c->connector = this;
+	return *this;
 }
 
 class interface
@@ -99,8 +99,8 @@ public:
 	interface(string interface_name);
 	interface(interface template_interface, string interface_name);
 	void add_io_pin(io pin);
-	io* operator()(string io_name);
-	io* operator[](int index);
+	io& operator()(string io_name);
+	io& operator[](int index);
 	int hash();
 };
 
@@ -123,27 +123,27 @@ void interface::add_io_pin(io pin)
 	io_pin_list.push_back(pin);
 }
 
-io* interface::operator()(string io_name)
+io& interface::operator()(string io_name)
 {
 	list<io>::iterator i;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		if ((*i).get_name() == io_name)
-			return &(*i);
+			return (*i);
 	}
-	return NULL;
+	//	return NULL;
 }
 
-io* interface::operator[](int index)
+io& interface::operator[](int index)
 {
 	list<io>::iterator i;
 	int j = 0;
 	if (index > (int)io_pin_list.size())
-		return NULL;
+//		return NULL;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i, ++j) {
 		if (j == index)
-			return &(*i);
+			return (*i);
 	}
-	return NULL;
+//	return NULL;
 }
 
 string interface::to_verilog_name()
@@ -304,11 +304,11 @@ int main()
 		c_file << (*iterator).to_c_name() << endl;
 	}
 
-	cout << step_motor_0("AX")->get_name();
-	cout << step_motor_0[0]->get_name();
+	cout << step_motor_0("AX").get_name();
+	cout << step_motor_0[0].get_name();
 
-	step_motor_0("AX")->operator =(pio26a("PIN_1"));
-	//step_motor_0("AX") = pio26a("PIN_1"); //compile error
+	step_motor_0("AX") = pio26a("PIN_1");
+
 
 	return 0;
 }
