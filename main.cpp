@@ -318,8 +318,8 @@ int main()
 	cout << step_motor_0("AX").get_name();
 	cout << step_motor_0[0].get_name();
 
-	step_motor_0("AX") = pio26a("PIN_0");
-	step_motor_0("BX") = pio26a("PIN_1");
+	step_motor_0("AX") = pio26a("PIN_1");
+	step_motor_0("BX") = pio26a("PIN_2");
 	step_motor_0[2] = pio26a[2];
 
 	cout << step_motor_0("AX").get_connector()->get_name() << endl;
