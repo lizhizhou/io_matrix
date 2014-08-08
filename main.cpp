@@ -279,6 +279,7 @@ vector<bool> combination_bitmap::operator[](int i)
 int main()
 {
 	interface pio26a =  interface("PIO26_A");
+	pio26a.add_io_pin(io("PIN_0", INOUT));
 	pio26a.add_io_pin(io("PIN_1", INOUT));
 	pio26a.add_io_pin(io("PIN_2", INOUT));
 	pio26a.add_io_pin(io("PIN_3", INOUT));
@@ -290,9 +291,23 @@ int main()
 	pio26a.add_io_pin(io("PIN_9", INOUT));
 	pio26a.add_io_pin(io("PIN_10", INOUT));
 	pio26a.add_io_pin(io("PIN_11", INOUT));
+	pio26a.add_io_pin(io("PIN_12", INOUT));
+	pio26a.add_io_pin(io("PIN_13", INOUT));
+	pio26a.add_io_pin(io("PIN_14", INOUT));
+	pio26a.add_io_pin(io("PIN_15", INOUT));
+	pio26a.add_io_pin(io("PIN_16", INOUT));
+	pio26a.add_io_pin(io("PIN_17", INOUT));
+	pio26a.add_io_pin(io("PIN_18", INOUT));
+	pio26a.add_io_pin(io("PIN_19", INOUT));
+	pio26a.add_io_pin(io("PIN_20", INOUT));
+	pio26a.add_io_pin(io("PIN_21", INOUT));
+	pio26a.add_io_pin(io("PIN_22", INOUT));
+	pio26a.add_io_pin(io("PIN_23", INOUT));
+	pio26a.add_io_pin(io("PIN_24", INOUT));
+	pio26a.add_io_pin(io("PIN_25", INOUT));
 
-	interface pio26b =  interface("PIO26_B");
-	pio26b.add_io_pin(io("PIN", INOUT, 26));
+	interface pio26b =  interface(pio26a, "PIO26_B");
+	//todo pio26b.add_io_pin(io("PIN", INOUT, 26));
 
 	interface step_motor_0 =  interface("step_motor_0");
 	step_motor_0.add_io_pin(io("AX", OUTPUT));
@@ -302,10 +317,14 @@ int main()
 	step_motor_0.add_io_pin(io("AE", OUTPUT));
 	step_motor_0.add_io_pin(io("BE", OUTPUT));
 	interface step_motor_1 =  interface(step_motor_0, "step_motor_1");
+	interface step_motor_2 =  interface(step_motor_0, "step_motor_2");
+	interface step_motor_3 =  interface(step_motor_0, "step_motor_3");
+
 	interface brush_motor_0 =  interface("brush_motor_0");
 	brush_motor_0.add_io_pin(io("HX", OUTPUT));
 	brush_motor_0.add_io_pin(io("HY", OUTPUT));
 	interface brush_motor_1 =  interface(brush_motor_0, "brush_motor_1");
+	interface brush_motor_2 =  interface(brush_motor_0, "brush_motor_2");
 
 	step_motor_0("AX") = pio26a("PIN_1");
 	step_motor_0("BX") = pio26a("PIN_2");
@@ -336,7 +355,7 @@ int main()
 	stringstream s;
 	int hash = 100;
 	s << hash;
-	string filename = "maxtrix"+ s.str() + ".v";
+	string filename = "matrix"+ s.str() + ".v";
 	ofstream verilog_file (filename.c_str());
 	verilog_file << "module " << "maxtrix" << "(" << endl;
 	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
