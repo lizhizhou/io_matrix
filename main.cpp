@@ -326,10 +326,34 @@ int main()
 	interface brush_motor_1 =  interface(brush_motor_0, "brush_motor_1");
 	interface brush_motor_2 =  interface(brush_motor_0, "brush_motor_2");
 
-	step_motor_0("AX") = pio26a("PIN_1");
-	step_motor_0("BX") = pio26a("PIN_2");
-	step_motor_0("AY") = pio26a("PIN_3");
-	step_motor_0("BY") = pio26a("PIN_4");
+	step_motor_0("AX") = pio26a("PIN_0");
+	step_motor_0("BX") = pio26a("PIN_1");
+	step_motor_0("AY") = pio26a("PIN_2");
+	step_motor_0("BY") = pio26a("PIN_3");
+	step_motor_0("AE") = pio26a("PIN_4");
+	step_motor_0("BE") = pio26a("PIN_5");
+
+	step_motor_1("AX") = pio26a("PIN_6");
+	step_motor_1("BX") = pio26a("PIN_7");
+	step_motor_1("AY") = pio26a("PIN_8");
+	step_motor_1("BY") = pio26a("PIN_9");
+	step_motor_1("AE") = pio26a("PIN_10");
+	step_motor_1("BE") = pio26a("PIN_11");
+
+	step_motor_2("AX") = pio26a("PIN_12");
+	step_motor_2("BX") = pio26a("PIN_13");
+	step_motor_2("AY") = pio26a("PIN_14");
+	step_motor_2("BY") = pio26a("PIN_15");
+	step_motor_2("AE") = pio26a("PIN_16");
+	step_motor_2("BE") = pio26a("PIN_17");
+
+	step_motor_3("AX") = pio26a("PIN_18");
+	step_motor_3("BX") = pio26a("PIN_19");
+	step_motor_3("AY") = pio26a("PIN_20");
+	step_motor_3("BY") = pio26a("PIN_21");
+	step_motor_3("AE") = pio26a("PIN_22");
+	step_motor_3("BE") = pio26a("PIN_23");
+
 
 	list<interface> left_side, right_side;
 	right_side.push_back(pio26a);
