@@ -23,17 +23,41 @@ enum direction {
 class io
 {
 private:
+	class interface* inf;
 	string name;
 	direction dir;
 	int width;
 	class io* connector;
 public:
-	string to_verilog_name();
+	string to_verilog_head();
+	string to_verilog_body();
 	string get_name();
+	string get_full_name();
 	int hash();
 	io(string io_name, direction d, int w = 1);
 	io& operator=(class io& c);
+	void set_interface(class interface* interface);
+	class interface* get_interface();
 	io* get_connector();
+};
+
+class interface
+{
+private:
+	string name;
+	list<io> io_pin_list;
+public:
+	string to_verilog_head();
+	string to_verilog_body();
+	string to_c_body();
+	string get_name();
+	interface(string interface_name);
+	interface(interface template_interface, string interface_name);
+	void add_io_pin(io pin);
+	io& operator()(string io_name);
+	io& operator[](int index);
+	size_t io_number();
+	int hash();
 };
 
 io::io(string io_name, direction d, int w)
@@ -42,9 +66,10 @@ io::io(string io_name, direction d, int w)
     dir = d;
     width = w;
     connector = NULL;
+    inf = NULL;
 }
 
-string io::to_verilog_name()
+string io::to_verilog_head()
 {
 	string buffer = "";
 	stringstream s;
@@ -70,9 +95,22 @@ string io::to_verilog_name()
 	return buffer;
 }
 
+string io::to_verilog_body()
+{
+	return name;
+}
+
 string io::get_name()
 {
 	return name;
+}
+
+string io::get_full_name()
+{
+	if (inf != NULL)
+		return name+ '_' + inf->get_name();
+	else
+		return name;
 }
 
 io& io::operator=(class io& c)
@@ -82,27 +120,20 @@ io& io::operator=(class io& c)
 	return *this;
 }
 
+void io::set_interface(class interface* interface)
+{
+	inf = interface;
+}
+
+class interface* io::get_interface()
+{
+	return inf;
+}
+
 io* io::get_connector()
 {
 	return connector;
 }
-
-class interface
-{
-private:
-	string name;
-	list<io> io_pin_list;
-public:
-	string to_verilog_name();
-	string to_c_name();
-	interface(string interface_name);
-	interface(interface template_interface, string interface_name);
-	void add_io_pin(io pin);
-	io& operator()(string io_name);
-	io& operator[](int index);
-	size_t io_number();
-	int hash();
-};
 
 interface::interface(string interface_name)
 {
@@ -120,6 +151,7 @@ interface::interface(interface template_interface, string interface_name)
 
 void interface::add_io_pin(io pin)
 {
+	pin.set_interface(this);
 	io_pin_list.push_back(pin);
 }
 
@@ -146,17 +178,35 @@ io& interface::operator[](int index)
 	return *((io*)NULL);
 }
 
-string interface::to_verilog_name()
+string interface::get_name()
+{
+	return name;
+}
+
+string interface::to_verilog_head()
 {
 	list<io>::iterator i;
 	string buffer = "";
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
-		buffer += (*i).to_verilog_name() + "_" + name + ",\n";
+		buffer += (*i).to_verilog_head() + "_" + name + ",\n";
 	}
 	return buffer;
 }
 
-string interface::to_c_name()
+string interface::to_verilog_body()
+{
+	list<io>::iterator i;
+	string buffer = "";
+	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
+		if (i->get_connector() != NULL && (i->get_interface() != NULL)) {
+			buffer += "assign " + (*i).get_full_name() + " = "
+                    + i->get_connector()->get_full_name() + ";\n";
+		}
+	}
+	return buffer;
+}
+
+string interface::to_c_body()
 {
 	list<io>::iterator iterator;
 	string buffer = "";
@@ -239,6 +289,7 @@ int main()
 	pio26a.add_io_pin(io("PIN_8", INOUT));
 	pio26a.add_io_pin(io("PIN_9", INOUT));
 	pio26a.add_io_pin(io("PIN_10", INOUT));
+	pio26a.add_io_pin(io("PIN_11", INOUT));
 
 	interface pio26b =  interface("PIO26_B");
 	pio26b.add_io_pin(io("PIN", INOUT, 26));
@@ -256,7 +307,11 @@ int main()
 	brush_motor_0.add_io_pin(io("HY", OUTPUT));
 	interface brush_motor_1 =  interface(brush_motor_0, "brush_motor_1");
 
-	list<interface>::iterator i;
+	step_motor_0("AX") = pio26a("PIN_1");
+	step_motor_0("BX") = pio26a("PIN_2");
+	step_motor_0("AY") = pio26a("PIN_3");
+	step_motor_0("BY") = pio26a("PIN_4");
+
 	list<interface> left_side, right_side;
 	right_side.push_back(pio26a);
 	right_side.push_back(pio26b);
@@ -284,43 +339,38 @@ int main()
 	string filename = "maxtrix"+ s.str() + ".v";
 	ofstream verilog_file (filename.c_str());
 	verilog_file << "module " << "maxtrix" << "(" << endl;
-	for (i = left_side.begin(); i != left_side.end(); ++i) {
-		verilog_file << (*i).to_verilog_name() << endl;
+	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
+		verilog_file << (*i).to_verilog_head() << endl;
 	}
 
-	for (i = right_side.begin(); i != right_side.end(); ++i) {
-		verilog_file << (*i).to_verilog_name() << endl;
+	for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
+		verilog_file << (*i).to_verilog_head() << endl;
 	}
 	verilog_file << "input clock";
 	verilog_file << ");" << endl;
 
-	list<io>::iterator j;
-//	for (i = left_side.begin(); i != left_side.end(); ++i) {
-//		for(j = i->)
-//	}
+	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
+		verilog_file << i->to_verilog_body();
+	}
 
 	verilog_file << "endmodule" << endl;
 
 	filename = "grid.h";
 	ofstream h_file (filename.c_str());
 
-	for (i = left_side.begin(); i != left_side.end(); ++i) {
-		h_file << (*i).to_c_name() << endl;
-	}
+//	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
+//		h_file << (*i).to_c_body() << endl;
+//	}
 
 	filename = "grid.c";
 	ofstream c_file (filename.c_str());
 
-	for (i = right_side.begin(); i != right_side.end(); ++i) {
-		c_file << (*i).to_c_name() << endl;
-	}
+//	for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
+//		c_file << (*i).to_c_body() << endl;
+//	}
 
 	cout << step_motor_0("AX").get_name();
 	cout << step_motor_0[0].get_name();
-
-	step_motor_0("AX") = pio26a("PIN_0");
-	step_motor_0("BX") = pio26a("PIN_1");
-	step_motor_0[2] = pio26a[2];
 
 	cout << step_motor_0("AX").get_connector()->get_name() << endl;
 	return 0;
