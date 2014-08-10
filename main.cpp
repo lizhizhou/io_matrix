@@ -118,17 +118,7 @@ int main()
 	left_side.push_back(brush_motor_2);
 	left_side.push_back(brush_motor_3);
 
-	vector< vector<bool> > bitmap_list = combination_bitmap(10).get_bitmap_list();
-	for (vector< vector<bool> >::iterator j = bitmap_list.begin(); j != bitmap_list.end(); j++)
-	{
-		vector<bool> bitmap = *j;
-		for (vector<bool>::iterator i = bitmap.begin(); i != bitmap.end(); i++)
-		{
-			cout << (int)(*i);
-		}
-		cout << endl;
-	}
-	cout << bitmap_list[1][2] << endl;
+
 
 	stringstream s;
 	int hash = 100;
@@ -168,8 +158,8 @@ int main()
 
 	cout << step_motor_0("AX").get_name();
 	cout << step_motor_0[0].get_name();
-
 	cout << step_motor_0("AX").get_connector()->get_name() << endl;
+
 	return 0;
 }
 

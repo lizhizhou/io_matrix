@@ -6,7 +6,10 @@
  */
 
 #include "interface.h"
-
+#include <iostream>
 namespace grid {
+void interface_unit_test()
+{
 
+}
 } /* namespace grid */
