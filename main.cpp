@@ -9,55 +9,12 @@
 #include <sstream>
 #include <string>
 #include <list>
-#include <vector>
 #include <stdlib.h>
 #include "io.h"
 #include "interface.h"
+#include "combinationbitmap.h"
 using namespace std;
 using namespace grid;
-
-class combination_bitmap
-{
-private:
-	vector<bool> bitmap;
-	vector< vector<bool> > bitmap_list;
-	void add_one_bitmap(vector< vector<bool> >* bitmap_list, vector<bool>* bitmap, size_t i, size_t n);
-public:
-	combination_bitmap(size_t n);
-	vector< vector<bool> > get_bitmap_list();
-	vector<bool> operator[](int i);
-	double to_value();
-};
-
-void combination_bitmap::add_one_bitmap(vector< vector<bool> >* bitmap_list, vector<bool>* bitmap, size_t i, size_t n)
-{
-	if(i == n) {
-		bitmap_list->push_back(*bitmap);
-		return;
-	}
-	i++;
-	bitmap->push_back(true);
-	add_one_bitmap(bitmap_list, bitmap, i, n);
-	bitmap->pop_back();
-	bitmap->push_back(false);
-	add_one_bitmap(bitmap_list, bitmap, i, n);
-	bitmap->pop_back();
-}
-
-combination_bitmap::combination_bitmap(size_t n)
-{
-	add_one_bitmap(&bitmap_list, &bitmap, 1, n);
-}
-
-vector< vector<bool> > combination_bitmap::get_bitmap_list()
-{
-	return bitmap_list;
-}
-
-vector<bool> combination_bitmap::operator[](int i)
-{
-	return bitmap_list[i];
-}
 
 int main()
 {
@@ -178,7 +135,7 @@ int main()
 	s << hash;
 	string filename = "matrix"+ s.str() + ".v";
 	ofstream verilog_file (filename.c_str());
-	verilog_file << "module " << "maxtrix" << "(" << endl;
+	verilog_file << "module " << "matrix" << "(" << endl;
 	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
 		verilog_file << i->to_verilog_head() << endl;
 	}
