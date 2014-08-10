@@ -11,227 +11,10 @@
 #include <list>
 #include <vector>
 #include <stdlib.h>
-
+#include "io.h"
+#include "interface.h"
 using namespace std;
-
-enum direction {
-	INPUT  = 1,
-	OUTPUT = 2,
-	INOUT  = 3
-};
-
-class io
-{
-private:
-	class interface* inf;
-	string name;
-	direction dir;
-	int width;
-	class io* connector;
-public:
-	string to_verilog_head();
-	string to_verilog_body();
-	string get_name();
-	string get_full_name();
-	int hash();
-	io(string io_name, direction d, int w = 1);
-	io& operator=(class io& c);
-	void set_interface(class interface* interface);
-	class interface* get_interface();
-	io* get_connector();
-};
-
-class interface
-{
-private:
-	string name;
-	list<io> io_pin_list;
-public:
-	string to_verilog_head();
-	string to_verilog_body();
-	string to_c_body();
-	string get_name();
-	interface(string interface_name);
-	interface(interface template_interface, string interface_name);
-	void add_io_pin(io pin);
-	io& operator()(string io_name);
-	io& operator[](int index);
-	size_t io_number();
-	int hash();
-};
-
-io::io(string io_name, direction d, int w)
-{
-	name = io_name;
-    dir = d;
-    width = w;
-    connector = NULL;
-    inf = NULL;
-}
-
-string io::to_verilog_head()
-{
-	string buffer = "";
-	stringstream s;
-	switch (dir)
-	{
-		case INPUT:
-		buffer += "input";
-		break;
-		case OUTPUT:
-		buffer += "output";
-		break;
-		case INOUT:
-		buffer += "inout";
-		break;
-		default:
-		break;
-	}
-	if (width > 1) {
-		s << (width - 1);
-		buffer = buffer + " " + "[0:"+ s.str() + "]";
-	}
-	buffer += " " + name;
-	return buffer;
-}
-
-string io::to_verilog_body()
-{
-	return name;
-}
-
-string io::get_name()
-{
-	return name;
-}
-
-string io::get_full_name()
-{
-	if (inf != NULL)
-		return name+ '_' + inf->get_name();
-	else
-		return name;
-}
-
-io& io::operator=(class io& c)
-{
-	this->connector = &c;
-	c.connector = this;
-	return *this;
-}
-
-void io::set_interface(class interface* interface)
-{
-	inf = interface;
-}
-
-class interface* io::get_interface()
-{
-	return inf;
-}
-
-io* io::get_connector()
-{
-	return connector;
-}
-
-interface::interface(string interface_name)
-{
-	name = interface_name;
-}
-
-interface::interface(interface template_interface, string interface_name)
-{
-	list<io>::iterator iterator;
-	for (iterator = template_interface.io_pin_list.begin(); iterator != template_interface.io_pin_list.end(); ++iterator) {
-		add_io_pin(*iterator);
-	}
-	name = interface_name;
-}
-
-void interface::add_io_pin(io pin)
-{
-	pin.set_interface(this);
-	io_pin_list.push_back(pin);
-}
-
-io& interface::operator()(string io_name)
-{
-	list<io>::iterator i;
-	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
-		if ((*i).get_name() == io_name)
-			return (*i);
-	}
-	return *((io*)NULL);
-}
-
-io& interface::operator[](int index)
-{
-	list<io>::iterator i;
-	int j = 0;
-	if (index > (int)io_pin_list.size())
-		return *((io*)NULL);
-	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i, ++j) {
-		if (j == index)
-			return (*i);
-	}
-	return *((io*)NULL);
-}
-
-string interface::get_name()
-{
-	return name;
-}
-
-string interface::to_verilog_head()
-{
-	list<io>::iterator i;
-	string buffer = "";
-	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
-		buffer += (*i).to_verilog_head() + "_" + name + ",\n";
-	}
-	return buffer;
-}
-
-string interface::to_verilog_body()
-{
-	list<io>::iterator i;
-	string buffer = "";
-	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
-		if (i->get_connector() != NULL && (i->get_interface() != NULL)) {
-			buffer += "assign " + (*i).get_full_name() + " = "
-                    + i->get_connector()->get_full_name() + ";\n";
-		}
-	}
-	return buffer;
-}
-
-string interface::to_c_body()
-{
-	list<io>::iterator iterator;
-	string buffer = "";
-	string pin_name;
-	buffer = buffer + "int" + " enable_" + name + "(void)\n";
-	buffer = buffer + "{\n";
-	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
-		pin_name = (*iterator).get_name() + "_" + name;
-		buffer = buffer + "if ("+ pin_name +" == 0) {\n" + pin_name + " = 1;\n" + "} else {\n" + "return 0;\n"+"}\n";
-	}
-	buffer = buffer + "return 1;\n" + "}\n";
-	buffer = buffer + "int" + " disable_" + name + "(void)\n";
-	buffer = buffer + "{\n";
-	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
-		pin_name = (*iterator).get_name() + "_" + name;
-		buffer = buffer + "if ("+ pin_name +" == 1) {\n" + pin_name + " = 0;\n" + "} else {\n" + "return 0;\n"+"}\n";
-	}
-	buffer = buffer + "return 1;\n" + "}\n";
-	return buffer;
-}
-
-size_t interface::io_number()
-{
-	return io_pin_list.size();
-}
+using namespace grid;
 
 class combination_bitmap
 {
@@ -325,6 +108,8 @@ int main()
 	brush_motor_0.add_io_pin(io("HY", OUTPUT));
 	interface brush_motor_1 =  interface(brush_motor_0, "brush_motor_1");
 	interface brush_motor_2 =  interface(brush_motor_0, "brush_motor_2");
+	interface brush_motor_3 =  interface(brush_motor_0, "brush_motor_3");
+	interface brush_motor_4 =  interface(brush_motor_0, "brush_motor4");
 
 	step_motor_0("AX") = pio26a("PIN_0");
 	step_motor_0("BX") = pio26a("PIN_1");
@@ -354,6 +139,14 @@ int main()
 	step_motor_3("AE") = pio26a("PIN_22");
 	step_motor_3("BE") = pio26a("PIN_23");
 
+	brush_motor_0("HX") = pio26b("PIN_0");
+	brush_motor_0("HY") = pio26b("PIN_1");
+	brush_motor_1("HX") = pio26b("PIN_2");
+	brush_motor_1("HY") = pio26b("PIN_3");
+	brush_motor_2("HX") = pio26b("PIN_4");
+	brush_motor_2("HY") = pio26b("PIN_5");
+	brush_motor_3("HX") = pio26b("PIN_6");
+	brush_motor_3("HY") = pio26b("PIN_7");
 
 	list<interface> left_side, right_side;
 	right_side.push_back(pio26a);
@@ -361,8 +154,12 @@ int main()
 
 	left_side.push_back(step_motor_0);
 	left_side.push_back(step_motor_1);
+	left_side.push_back(step_motor_2);
+	left_side.push_back(step_motor_3);
 	left_side.push_back(brush_motor_0);
 	left_side.push_back(brush_motor_1);
+	left_side.push_back(brush_motor_2);
+	left_side.push_back(brush_motor_3);
 
 	vector< vector<bool> > bitmap_list = combination_bitmap(10).get_bitmap_list();
 	for (vector< vector<bool> >::iterator j = bitmap_list.begin(); j != bitmap_list.end(); j++)
@@ -383,11 +180,11 @@ int main()
 	ofstream verilog_file (filename.c_str());
 	verilog_file << "module " << "maxtrix" << "(" << endl;
 	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
-		verilog_file << (*i).to_verilog_head() << endl;
+		verilog_file << i->to_verilog_head() << endl;
 	}
 
 	for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
-		verilog_file << (*i).to_verilog_head() << endl;
+		verilog_file << i->to_verilog_head() << endl;
 	}
 	verilog_file << "input clock";
 	verilog_file << ");" << endl;
