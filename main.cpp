@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include "io.h"
 #include "interface.h"
-#include "combinationbitmap.h"
+//#include "combinationbitmap.h"
 using namespace std;
 using namespace grid;
 
@@ -47,6 +47,9 @@ int main()
 	pio26a.add_io_pin(io("PIN_25", INOUT));
 
 	interface pio26b =  interface(pio26a, "PIO26_B");
+	interface pioin26a =  interface(pio26a, "PIOIN26_A");
+	interface pioin26b =  interface(pio26a, "PIOIN26_B");
+
 	//todo pio26b.add_io_pin(io("PIN", INOUT, 26));
 
 	interface step_motor_0 =  interface("step_motor_0");
@@ -117,8 +120,8 @@ int main()
 	left_side.push_back(brush_motor_1);
 	left_side.push_back(brush_motor_2);
 	left_side.push_back(brush_motor_3);
-
-
+	left_side.push_back(pioin26a);
+	left_side.push_back(pioin26b);
 
 	stringstream s;
 	int hash = 100;
