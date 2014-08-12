@@ -71,6 +71,11 @@ int main()
 	interface brush_motor_3 =  interface(brush_motor_0, "brush_motor_3");
 	interface brush_motor_4 =  interface(brush_motor_0, "brush_motor4");
 
+	interface sht1x_sensor_0 =  interface("sht1x_sensor_0");
+	sht1x_sensor_0.add_io_pin(io("sck", OUTPUT));
+	sht1x_sensor_0.add_io_pin(io("dir", OUTPUT));
+	sht1x_sensor_0.add_io_pin(io("sda", INOUT));
+
 	step_motor_0("AX") = pio26a("PIN_0");
 	step_motor_0("BX") = pio26a("PIN_1");
 	step_motor_0("AY") = pio26a("PIN_2");
