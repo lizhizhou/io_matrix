@@ -73,7 +73,7 @@ int main()
 
 	interface sht1x_sensor_0 =  interface("sht1x_sensor_0");
 	sht1x_sensor_0.add_io_pin(io("sck", OUTPUT));
-	sht1x_sensor_0.add_io_pin(io("dir", OUTPUT));
+	sht1x_sensor_0.add_io_pin(io("dir", INPUT));
 	sht1x_sensor_0.add_io_pin(io("sda", INOUT));
 
 	step_motor_0("AX") = pio26a("PIN_0");
@@ -113,6 +113,10 @@ int main()
 	brush_motor_3("HX") = pio26b("PIN_6");
 	brush_motor_3("HY") = pio26b("PIN_7");
 
+	sht1x_sensor_0("sck") = pio26b("PIN_8");
+	sht1x_sensor_0("dir") = pio26b("PIN_9");
+	sht1x_sensor_0("sda") = pio26b("PIN_10");
+
 	list<interface> left_side, right_side;
 	right_side.push_back(pio26a);
 	right_side.push_back(pio26b);
@@ -125,8 +129,10 @@ int main()
 	left_side.push_back(brush_motor_1);
 	left_side.push_back(brush_motor_2);
 	left_side.push_back(brush_motor_3);
+	left_side.push_back(sht1x_sensor_0);
 	left_side.push_back(pioin26a);
 	left_side.push_back(pioin26b);
+
 
 	stringstream s;
 	int hash = 100;
