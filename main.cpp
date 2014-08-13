@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include "io.h"
 #include "interface.h"
-//#include "combinationbitmap.h"
+#include "combinationbitmap.h"
 using namespace std;
 using namespace grid;
 
