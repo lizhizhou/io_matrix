@@ -35,6 +35,9 @@ public:
 	void set_interface(class interface* interface);
 	class interface* get_interface();
 	io* get_connector();
+	bool is_input();
+	bool is_oupput();
+	bool is_inout();
 };
 
 } /* namespace grid */

@@ -73,8 +73,14 @@ string interface::to_verilog_body()
 	string buffer = "";
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		if (i->get_connector() != NULL && (i->get_interface() != NULL)) {
-			buffer += "assign " + (*i).get_full_name() + " = "
-                    + i->get_connector()->get_full_name() + ";\n";
+			if(i->is_input()) {
+				buffer += "assign " + (*i).get_full_name() + " = "
+						+ i->get_connector()->get_full_name() + ";\n";
+			}
+			else if(i->is_oupput()) {
+				buffer += "assign " + i->get_connector()->get_full_name() + " = "
+						+ (*i).get_full_name() + ";\n";
+			}
 		}
 	}
 	return buffer;

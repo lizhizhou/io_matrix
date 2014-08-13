@@ -83,5 +83,17 @@ io* io::get_connector()
 	return connector;
 }
 
+bool io::is_input()
+{
+	return (dir == INPUT? true:false);
+}
+bool io::is_oupput()
+{
+	return (dir == OUTPUT? true:false);
+}
+bool io::is_inout()
+{
+	return (dir == INOUT? true:false);
+}
 
 } /* namespace grid */
