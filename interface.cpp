@@ -81,6 +81,10 @@ string interface::to_verilog_body()
 				buffer += "assign " + i->get_connector()->get_full_name() + " = "
 						+ (*i).get_full_name() + ";\n";
 			}
+			else if(i->is_inout() && i->get_connector()->is_inout()) {
+				buffer += "assign " + (*i).get_full_name() + " = "
+						+ i->get_connector()->get_full_name() + ";\n";
+			}
 		}
 	}
 	return buffer;
