@@ -40,5 +40,11 @@ public:
 	bool is_inout();
 };
 
+class input_io: pubilc io {
+
+};
+
+}
+
 } /* namespace grid */
 #endif /* IO_H_ */
