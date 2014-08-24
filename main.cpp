@@ -133,30 +133,34 @@ int main()
 	left_side.push_back(pioin26a);
 	left_side.push_back(pioin26b);
 
+	combination_bitmap bitmap = combination_bitmap(left_side.size());
 
-	stringstream s;
-	int hash = 100;
-	s << hash;
-	string filename = "matrix"+ s.str() + ".v";
-	ofstream verilog_file (filename.c_str());
-	verilog_file << "module " << "matrix" << "(" << endl;
-	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
-		verilog_file << i->to_verilog_head() << endl;
+	cout << bitmap.height << "  " << bitmap.width;
+	for (int i = 0; i< bitmap.height ; i++) {
+		stringstream s;
+		int hash = bitmap.to_value();
+		s << hash;
+		string filename = "matrix"+ s.str() + ".v";
+		ofstream verilog_file (filename.c_str());
+		verilog_file << "module " << "matrix" << "(" << endl;
+		for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
+			verilog_file << i->to_verilog_head() << endl;
+		}
+
+		for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
+			verilog_file << i->to_verilog_head() << endl;
+		}
+		verilog_file << "input clock";
+		verilog_file << ");" << endl;
+
+		for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
+			verilog_file << i->to_verilog_body();
+		}
+
+		verilog_file << "endmodule" << endl;
 	}
 
-	for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
-		verilog_file << i->to_verilog_head() << endl;
-	}
-	verilog_file << "input clock";
-	verilog_file << ");" << endl;
-
-	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
-		verilog_file << i->to_verilog_body();
-	}
-
-	verilog_file << "endmodule" << endl;
-
-	filename = "grid.h";
+	string filename = "grid.h";
 	ofstream h_file (filename.c_str());
 
 //	for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i) {
@@ -169,6 +173,7 @@ int main()
 //	for (list<interface>::iterator i = right_side.begin(); i != right_side.end(); ++i) {
 //		c_file << (*i).to_c_body() << endl;
 //	}
+
 
 	cout << step_motor_0("AX").get_name();
 	cout << step_motor_0[0].get_name();

@@ -12,6 +12,7 @@ namespace grid {
 interface::interface(string interface_name)
 {
 	name = interface_name;
+	en = true;
 }
 
 interface::interface(interface template_interface, string interface_name)
@@ -61,6 +62,8 @@ string interface::to_verilog_head()
 {
 	list<io>::iterator i;
 	string buffer = "";
+	if (!en)
+		return buffer;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		buffer += (*i).to_verilog_head() + "_" + name + ",\n";
 	}
@@ -71,6 +74,8 @@ string interface::to_verilog_body()
 {
 	list<io>::iterator i;
 	string buffer = "";
+	if (!en)
+		return buffer;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		if (i->get_connector() != NULL && (i->get_interface() != NULL)) {
 			if(i->is_input()) {
@@ -95,6 +100,8 @@ string interface::to_c_body()
 	list<io>::iterator iterator;
 	string buffer = "";
 	string pin_name;
+	if (!en)
+		return buffer;
 	buffer = buffer + "int" + " enable_" + name + "(void)\n";
 	buffer = buffer + "{\n";
 	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
@@ -115,6 +122,16 @@ string interface::to_c_body()
 size_t interface::io_number()
 {
 	return io_pin_list.size();
+}
+
+void interface::enable()
+{
+	en = true;
+}
+
+void interface::disable()
+{
+	en = false;
 }
 
 } /* namespace grid */

@@ -18,6 +18,8 @@ private:
 	vector< vector<bool> > bitmap_list;
 	void add_one_bitmap(vector< vector<bool> >* bitmap_list, vector<bool>* bitmap, size_t i, size_t n);
 public:
+	int height;
+	int width;
 	combination_bitmap(size_t n);
 	vector< vector<bool> > get_bitmap_list();
 	vector<bool> operator[](int i);

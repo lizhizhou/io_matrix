@@ -18,6 +18,7 @@ class interface
 private:
 	string name;
 	list<io> io_pin_list;
+	bool en;
 public:
 	string to_verilog_head();
 	string to_verilog_body();
@@ -29,6 +30,8 @@ public:
 	io& operator()(string io_name);
 	io& operator[](int index);
 	size_t io_number();
+	void enable();
+	void disable();
 	int hash();
 };
 
