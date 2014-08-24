@@ -136,7 +136,16 @@ int main()
 	combination_bitmap bitmap = combination_bitmap(left_side.size());
 
 	cout << bitmap.height << "  " << bitmap.width;
-	for (int i = 0; i< bitmap.height ; i++) {
+	for (int k = 0; k< bitmap.height; k++) {
+		int j;
+		for (list<interface>::iterator i = left_side.begin(); i != left_side.end(); ++i, j++) {
+			if(bitmap[k][j] == true)
+			{
+				i->enable();
+			}
+			else
+				i->disable();
+		}
 		stringstream s;
 		int hash = bitmap.to_value();
 		s << hash;

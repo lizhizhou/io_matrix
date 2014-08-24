@@ -62,8 +62,6 @@ string interface::to_verilog_head()
 {
 	list<io>::iterator i;
 	string buffer = "";
-	if (!en)
-		return buffer;
 	for (i = io_pin_list.begin(); i != io_pin_list.end(); ++i) {
 		buffer += (*i).to_verilog_head() + "_" + name + ",\n";
 	}
@@ -100,8 +98,6 @@ string interface::to_c_body()
 	list<io>::iterator iterator;
 	string buffer = "";
 	string pin_name;
-	if (!en)
-		return buffer;
 	buffer = buffer + "int" + " enable_" + name + "(void)\n";
 	buffer = buffer + "{\n";
 	for (iterator = io_pin_list.begin(); iterator != io_pin_list.end(); ++iterator) {
