@@ -129,7 +129,7 @@ int main()
 	left_side.push_back(brush_motor_1);
 	left_side.push_back(brush_motor_2);
 	left_side.push_back(brush_motor_3);
-	left_side.push_back(sht1x_sensor_0);
+	//todo left_side.push_back(sht1x_sensor_0);
 	left_side.push_back(pioin26a);
 	left_side.push_back(pioin26b);
 
